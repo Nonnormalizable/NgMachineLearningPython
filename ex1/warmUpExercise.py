@@ -12,11 +12,11 @@ from pprint import pprint
 import numpy as np
 
 # OK, there's no "the" identity matrix in Python, but a numpy array of arrays
-# seems the appropiate thing  in this context.
+# seems the appropiate thing in this context.
 A = np.identity(5)
 pprint(A)
 
-
+# Print, return, whatever.
 
 
 
