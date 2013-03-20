@@ -33,3 +33,11 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# Octave files
+*.m
+
+# Other
+*.zip
+*.pdf
+*~
