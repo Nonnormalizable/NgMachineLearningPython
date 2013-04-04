@@ -7,44 +7,51 @@ import matplotlib.pyplot as plt
 
 
 ## Helper functions
-colName = ['ones', 'size', 'rooms']
 def featureNormalize(X):
-
+    """
+    Make all features have mean 0 and std 1. Use pandas!
+    """
     # Goodness, this is easy with pandas.
     X_norm = (X - X.mean())/X.std()
     mu = X.mean()
     sigma = X.std()
     return X_norm, mu, sigma
 
+
 def predictValues(X, theta):
-    predictedValues = X.apply(lambda x:
-                                  (x[colName[0]]*theta[0] +
-                                   x[colName[1]]*theta[1] +
-                                   x[colName[2]]*theta[2]),
-                              axis=1)
+    """
+    With X and theta as numpy arrays, finding y for all m samples is just
+    a dot product.
+    """
+    predictedValues = np.dot(X, theta)
     return predictedValues
 
+
 def computeCostMulti(X, y, theta):
+    """
+    Compute the cost function with numpy arrays as imput.
+    """
     m = len(y)
     predictedValues = predictValues(X, theta)
-    sumOfSquareErrors = (predictedValues - y['price']).apply(np.square).sum()
+    sumOfSquareErrors = np.square(predictedValues-y).sum()
     cost = sumOfSquareErrors / (2*m)
-
     return cost
 
+
 def gradientDescentMulti(X, y, theta, alpha, num_iters, verbose=False):
-    m = len(y)  # number of training examples
+    """
+    Takes numpy arrays and does the gradient descent.
+    """
+    m = len(y)
     costHistory = []
 
     if verbose:
         print 'theta input ', theta
         print 'initial cost %e' % computeCostMulti(X, y, theta)
-        
-    colName = ['ones', 'size', 'rooms']
+
     for i in xrange(num_iters):
         predictedValues = predictValues(X, theta)
-        for i in [0,1,2]:
-            theta[i] = theta[i] - alpha / m * ((predictedValues - y['price']) * X[colName[i]]).sum() 
+        theta = theta - alpha / m * np.dot((predictedValues - y), X)
 
         cost = computeCostMulti(X, y, theta)
         costHistory.append(cost)
@@ -52,18 +59,20 @@ def gradientDescentMulti(X, y, theta, alpha, num_iters, verbose=False):
         if verbose:
             print '    %04i theta' % i, theta
             print '    %04i cost %e' % (i, cost)
-
     return theta, Series(costHistory)
 
-def normalEqn(X, y):
-    X = X[[colName[0], colName[1], colName[2]]]
 
+def normalEqn(X, y):
+    """
+    Find the closed form solution using numpy matrix methods.
+    """
     xtx = np.dot(X.transpose(), X)
     pinv = np.linalg.pinv(xtx)
-    theta = np.dot(pinv,np.dot(X.transpose(),y))
+    theta = np.dot(pinv, np.dot(X.transpose(), y))
     theta = theta.flatten()
-    
+
     return theta
+
 
 if __name__ == '__main__':
 
@@ -77,7 +86,8 @@ if __name__ == '__main__':
     print 'Loading data ...'
 
     ## Load Data
-    data = pd.read_csv('ex1data2.txt', header=None, names=['size', 'rooms', 'price'])
+    data = pd.read_csv('ex1data2.txt', header=None,
+                       names=['size', 'rooms', 'price'])
     X = data[['size', 'rooms']]
     y = data[['price']]
     m = len(y)
@@ -93,7 +103,8 @@ if __name__ == '__main__':
 
     # Add intercept term to X
     X['ones'] = np.ones(m)
-
+    X_array = np.array(X[['ones', 'size', 'rooms']])
+    y_array = np.array(y).flatten()
 
     ## ================ Part 2: Gradient Descent ================
 
@@ -103,9 +114,11 @@ if __name__ == '__main__':
     alpha = 0.01
     num_iters = 1000
 
-    # Init Theta and Run Gradient Descent 
+    # Init Theta and Run Gradient Descent
     theta_grad = np.zeros(3)
-    theta_grad, costHistory = gradientDescentMulti(X, y, theta_grad, alpha, num_iters, verbose=False)
+    theta_grad, costHistory = gradientDescentMulti(X_array, y_array, theta_grad,
+                                                   alpha, num_iters,
+                                                   verbose=False)
 
     # Plot the convergence graph
     print 'Theta found by gradient descent, %04i iter:' % num_iters
@@ -118,21 +131,21 @@ if __name__ == '__main__':
     f1.show()
 
     # Estimate the price of a 1650 sq-ft, 3 br house
-    X1 = DataFrame({'ones':[1],
-                    'size':[(1650-mu['size'])/sigma['size']],
-                    'rooms':[(3-mu['rooms'])/sigma['rooms']]})
-    X1 = X1[colName]
-    price_grad = predictValues(X1, theta_grad)[0]
+    X1 = np.array([1,
+                   (1650-mu['size'])/sigma['size'],
+                   (3-mu['rooms'])/sigma['rooms']])
+
+    price_grad = predictValues(X1, theta_grad)
 
     print 'Predicted price of a 1650 sq-ft, 3 br house '\
-             '(using gradient descent): \n$%.2f\n' % price_grad
+        '(using gradient descent): \n$%.2f\n' % price_grad
 
     ## ================ Part 3: Normal Equations ================
 
     print 'Solving with normal equations...'
 
     # Calculate the parameters from the normal equation
-    theta_norm = normalEqn(X, y)
+    theta_norm = normalEqn(X_array, y_array)
 
     # Display normal equation's result
     print 'Theta computed from the normal equations:'
@@ -142,6 +155,7 @@ if __name__ == '__main__':
     price_norm = np.dot(X1, theta_norm)
 
     print 'Predicted price of a 1650 sq-ft, 3 br house '\
-             '(using normal equations): \n$%.2f\n' % price_norm
-    
-    print 'Fractional difference: %.2f%%' % ( (price_norm - price_grad)/((price_grad+price_norm)/2)*100 )
+        '(using normal equations): \n$%.2f\n' % price_norm
+
+    print 'Fractional difference: %.2f%%' %\
+        ((price_norm - price_grad)/((price_grad+price_norm)/2)*100)
