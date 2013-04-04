@@ -48,7 +48,7 @@ def gradientDescent(X, y, theta, alpha, num_iters, verbose=False):
 
         predictedValues = X['population'].apply(lambda x: theta[0] + theta[1]*x)
 
-        # Okay, here the column of ones would have made it a wee bit nicer here.
+        # Okay, the column of ones would have made it a wee bit nicer here.
         theta[0] = theta[0] - alpha / m * (predictedValues - y['profit']).sum()
         theta[1] = theta[1] - alpha / m * ((predictedValues - y['profit']) * X['population']).sum()
 
@@ -113,10 +113,12 @@ if __name__ == '__main__':
     plt.plot(seq, fitLine(seq), 'r', label='Linear regression')
 
     plt.legend(loc='upper left')
+
     f2.show()
 
     # Predict values for population sizes of 35,000 and 70,000
     predict1 = np.dot([1, 3.5], theta)
+
     print 'For population = 35,000, we predict a profit of %.2f' % (predict1*10000)
 
     predict2 = np.dot([1, 7], theta)
