@@ -15,4 +15,4 @@ Main files:
 
 ## Exercise 2
 
-Everything is in `ex2.py`.
+Problem 1 is solved in `ex2_p1.py`, problem 2 in `ex2_p2.py`. Both use functions in `helperFunctions.py`.
