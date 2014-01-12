@@ -6,7 +6,7 @@ from pandas import Series, DataFrame
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
-from helperFunctions import plotData, sigmoid
+from helperFunctions import plotData, sigmoid, mapFeature
 
 ## Machine Learning Online Class - Exercise 2: Logistic Regression
 # Problem 1, Logistic Regression
@@ -64,8 +64,7 @@ if __name__ == '__main__':
     m, n = np.shape(X)
 
     # Add intercept term to x and X_test
-    X['ones'] = np.ones(m)
-    X_array = np.array(X[['ones', 0, 1]])
+    X_array = mapFeature(X)
     y_array = np.array(y)
 
     # Initialize fitting parameters
