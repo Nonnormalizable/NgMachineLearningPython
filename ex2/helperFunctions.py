@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def plotData(X, y, theta=None):
     """
     Plots the data points X and y into a new figure.
@@ -14,17 +15,18 @@ def plotData(X, y, theta=None):
     p.axes.yaxis.label.set_text('Variable 2')
     p.axes.xaxis.label.set_text('Variable 1')
 
-    if not theta==None:
-        l = plt.Line2D([20, -1/theta[2]*(theta[1]*20+theta[0])], [-1/theta[1]*(theta[2]*20+theta[0]), 20],
+    if theta is not None:
+        l = plt.Line2D([20, -1/theta[2]*(theta[1]*20+theta[0])],
+                       [-1/theta[1]*(theta[2]*20+theta[0]), 20],
                        color='black', label='Decision boundary')
         p.axes.add_line(l)
 
     plt.legend(loc='upper right')
 
     f.show()
-    
+
     return
-    
+
 
 def mapFeature(X, degree=1):
     """
@@ -35,8 +37,8 @@ def mapFeature(X, degree=1):
 
     m, n = np.shape(X)
 
-    if not n==2:
-        raise ValueError, "mapFeature supports input feature vectors of length 2, not %i" % n
+    if not n == 2:
+        raise ValueError('mapFeature supports input feature vectors of length 2, not %i' % n)
 
     out = np.ones([1, m])
 
@@ -58,3 +60,46 @@ def sigmoid(z):
 
     return g
 
+
+def costFunction(theta, X, y):
+    """
+    Compute cost and gradient for logistic regression
+    COSTFUNCTION(theta, X, y) computes the cost of using theta as the
+    parameter for logistic regression and the gradient of the cost
+    w.r.t. to the parameters.
+    """
+
+    m = len(y) * 1.0
+
+    cost = 1/m * (
+        np.dot(-1*y, np.log(sigmoid(np.dot(X, theta))))
+        - np.dot(1 - y, np.log(1 - sigmoid(np.dot(X, theta))))
+        )
+
+    grad = 1/m * np.dot(sigmoid(np.dot(X, theta)) - y, X)
+
+    return cost, grad
+
+
+def costFunctionReg(theta, X, y, lamb):
+    """
+    Compute cost and gradient for logistic regression with regularization
+    JCOSTFUNCTIONREG(theta, X, y, lamb) computes the cost of using
+    theta as the parameter for regularized logistic regression and the
+    gradient of the cost w.r.t. to the parameters.
+    """
+
+    m = len(y) * 1.0
+
+    cost = 1/m * (
+        np.dot(-1*y, np.log(sigmoid(np.dot(X, theta))))
+        - np.dot(1 - y, np.log(1 - sigmoid(np.dot(X, theta))))
+        + lamb / 2 * np.sum(np.power(theta[1:], 2))
+        )
+
+    grad = 1/m * (
+        np.dot(sigmoid(np.dot(X, theta)) - y, X)
+        + lamb * np.append(0, theta[1:])
+        )
+
+    return cost, grad
