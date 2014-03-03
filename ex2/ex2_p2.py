@@ -39,61 +39,43 @@ if __name__ == '__main__':
 
     # Note that mapFeature also adds a column of ones for us, so the intercept
     # term is handled
-    X = mapFeature(X, degree=6)
-    y = np.array(y)
+    X_long = mapFeature(X, degree=6)
+    y_long = np.array(y)
 
     # Initialize fitting parameters
-    initial_theta = np.zeros(np.size(X[0]))
+    initial_theta = np.zeros(np.size(X_long[0]))
 
     # Set regularization parameter lambda to 1
     lamb = 1
 
     # Compute and display initial cost and gradient for regularized logistic
     # regression
-    [cost, grad] = costFunctionReg(initial_theta, X, y, lamb)
+    [cost, grad] = costFunctionReg(initial_theta, X_long, y_long, lamb)
     print 'Cost at initial theta (zeros): %f' % cost
-    print 'Gradient at initial theta (zeros):', grad
+    print 'Gradient at initial theta (zeros):'
+    print grad
     print ''
 
-# ## ============= Part 2: Regularization and Accuracies =============
-# #  Optional Exercise:
-# #  In this part, you will get to try different values of lambda and
-# #  see how regularization affects the decision coundart
-# #
-# #  Try the following values of lambda (0, 1, 10, 100).
-# #
-# #  How does the decision boundary change when you vary lambda? How does
-# #  the training set accuracy vary?
-# #
-# 
-# # Initialize fitting parameters
-# initial_theta = zeros(size(X, 2), 1);
-# 
-# # Set regularization parameter lambda to 1 (you should vary this)
-# lambda = 1;
-# 
-# # Set Options
-# options = optimset('GradObj', 'on', 'MaxIter', 400);
-# 
-# # Optimize
-# [theta, J, exit_flag] = ...
-#   fminunc(@(t)(costFunctionReg(t, X, y, lambda)), initial_theta, options);
-# 
-# # Plot Boundary
-# plotDecisionBoundary(theta, X, y);
-# hold on;
-# title(sprintf('lambda = #g', lambda))
-# 
-# # Labels and Legend
-# xlabel('Microchip Test 1')
-# ylabel('Microchip Test 2')
-# 
-# legend('y = 1', 'y = 0', 'Decision boundary)
-# hold off;
-# 
-# # Compute accuracy on our training set
-# p = predict(theta, X);
-# 
-# fprintf('Train Accuracy: #f\n', mean(double(p == y)) * 100);
+    ## ============= Part 2: Regularization and Accuracies =============
+    #  Optional Exercise:
+    #  In this part, you will get to try different values of lambda and
+    #  see how regularization affects the decision coundart
+    #
+    #  Try the following values of lambda (0, 1, 10, 100).
+    #
+    #  How does the decision boundary change when you vary lambda? How does
+    #  the training set accuracy vary?
 
+    # Optimize
+    result_Newton_CG = minimize(lambda t: costFunctionReg(t, X_long, y_long, lamb),
+                                initial_theta, method='Newton-CG', jac=True)
+    theta = result_Newton_CG['x']
 
+    # Plot Boundary
+    f = plotData(X, y, theta)
+    plt.title('lamb = %f' % lamb)
+
+    # Compute accuracy on our training set
+    #p = predict(theta, X)
+
+    #print 'Train Accuracy: %' % mean(double(p == y)) * 100
