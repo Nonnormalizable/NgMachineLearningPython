@@ -6,7 +6,7 @@ from pandas import Series, DataFrame
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
-from helperFunctions import plotData, sigmoid, mapFeature, costFunctionReg
+from helperFunctions import plotData, sigmoid, mapFeature, costFunctionReg, predict
 
 ## Machine Learning Online Class - Exercise 2: Logistic Regression
 # Problem 2, Regularized Logistic Regression
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     initial_theta = np.zeros(np.size(X_long[0]))
 
     # Set regularization parameter lambda to 1
-    lamb = 1
+    lamb = 0.1
 
     # Compute and display initial cost and gradient for regularized logistic
     # regression
@@ -67,8 +67,10 @@ if __name__ == '__main__':
     #  the training set accuracy vary?
 
     # Optimize
+    print 'Start Optimize'
     result_Newton_CG = minimize(lambda t: costFunctionReg(t, X_long, y_long, lamb),
                                 initial_theta, method='Newton-CG', jac=True)
+    print 'End Optimize'
     theta = result_Newton_CG['x']
 
     # Plot Boundary
@@ -76,6 +78,6 @@ if __name__ == '__main__':
     plt.title('lamb = %f' % lamb)
 
     # Compute accuracy on our training set
-    #p = predict(theta, X)
+    p = predict(theta, X_long)
 
-    #print 'Train Accuracy: %' % mean(double(p == y)) * 100
+    print 'Train Accuracy: %f' % (np.mean(p == y) * 100)

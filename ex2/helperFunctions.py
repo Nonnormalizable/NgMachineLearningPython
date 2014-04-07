@@ -126,15 +126,28 @@ def costFunctionReg(theta, X, y, lamb):
 
     m = len(y) * 1.0
 
+    shorttheta = theta[1:]
+
     cost = 1/m * (
         np.dot(-1*y, np.log(sigmoid(np.dot(X, theta))))
         - np.dot(1 - y, np.log(1 - sigmoid(np.dot(X, theta))))
-        + lamb / 2 * np.sum(np.power(theta[1:], 2))
+        + lamb / 2 * np.inner(shorttheta, shorttheta)
         )
 
     grad = 1/m * (
         np.dot(sigmoid(np.dot(X, theta)) - y, X)
-        + lamb * np.append(0, theta[1:])
+        + lamb * np.append(0, shorttheta)
         )
 
     return cost, grad
+
+
+def predict(theta, X):
+    """
+    PREDICT Predict whether the label is 0 or 1 using learned logistic
+    regression parameters theta
+    p = PREDICT(theta, X) computes the predictions for X using a
+    threshold at 0.5 (i.e., if sigmoid(theta'*x) >= 0.5, predict 1)
+    """
+
+    return sigmoid(np.dot(X, theta)) > 0.5
